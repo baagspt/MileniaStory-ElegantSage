@@ -1,58 +1,70 @@
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
-// --- Komponen TimelineItem (Satu Titik di Garis Waktu) ---
+// =================================================================
+// 1. DEFINISI KOMPONEN TimelineItem
+// =================================================================
+
 interface TimelineItemProps {
     date: string;
     title: string;
     description: string;
     imageUrl: string;
-    index: number; 
+    // index: number; <-- DIHAPUS DARI INTERFACE
+    isLast: boolean; 
 }
 
-// POSISI PIN (ikon) relatif terhadap kontainer KARTU (desktop) - TIDAK BERUBAH
+// Konstanta untuk posisi dan ukuran Pin (tidak berubah, digunakan untuk perhitungan)
 const PIN_PULL_LEFT_DESKTOP = '-32px'; 
-const PIN_PULL_LEFT_MOBILE = '-16px';
-
-// Tinggi pin
-const PIN_HEIGHT_DESKTOP = '32px'; 
-const PIN_HEIGHT_MOBILE = '24px';
-
-// Margin-bottom dari div TimelineItem = 40px (my-10)
-const ITEM_MARGIN_BOTTOM = '40px'; 
-
-// PENTING: Panjang Garis Ekstra di bawah item yang ingin dipanjangkan
-const EXTRA_LINE_HEIGHT = '445px'; 
-
+const PIN_PULL_LEFT_MOBILE = '-25px';
+const PIN_HEIGHT_DESKTOP = 32; // Dalam piksel
+const PIN_HEIGHT_MOBILE = 24; // Dalam piksel
+const ITEM_MARGIN_BOTTOM = 40; // Dalam piksel (dari my-10)
 
 const TimelineItem: React.FC<TimelineItemProps> = ({
     date,
     title,
     description,
     imageUrl,
-    index 
+    // index, <-- DIHAPUS DARI DESTRUCTURING
+    isLast 
 }) => {
-    
-    // Tentukan apakah garis harus digambar (hanya untuk index 0 dan 1)
-    const shouldDrawLine = index < 2; 
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [cardHeight, setCardHeight] = useState(0);
 
-    // PENTING: Tentukan apakah garis harus panjang statis (untuk index 0 dan 1)
-    const shouldExtendLong = index === 0 || index === 1;
+    // Fungsi untuk menghitung tinggi konten secara dinamis
+    useEffect(() => {
+        const updateHeight = () => {
+            if (cardRef.current) {
+                // Ambil tinggi kartu dan tambahkan margin bawahnya
+                setCardHeight(cardRef.current.offsetHeight + ITEM_MARGIN_BOTTOM);
+            }
+        };
 
-    // Tentukan tinggi garis untuk Desktop
-    let desktopLineHeight;
-    if (shouldExtendLong) { 
-        desktopLineHeight = EXTRA_LINE_HEIGHT; 
-    } else { 
-        desktopLineHeight = `calc(100% + ${ITEM_MARGIN_BOTTOM} - ${PIN_HEIGHT_DESKTOP})`; 
-    }
+        // Hitung awal
+        updateHeight(); 
+        
+        // Tambahkan listener untuk mendengarkan perubahan ukuran
+        window.addEventListener('resize', updateHeight);
 
-    // Tentukan tinggi garis untuk Mobile
-    let mobileLineHeight;
-    if (shouldExtendLong) { 
-        mobileLineHeight = EXTRA_LINE_HEIGHT; 
-    } else { 
-        mobileLineHeight = `calc(100% + ${ITEM_MARGIN_BOTTOM} - ${PIN_HEIGHT_MOBILE})`; 
-    }
+        // Observer untuk mendeteksi perubahan DOM di dalam kartu (misalnya saat konten memuat)
+        const observer = new MutationObserver(updateHeight);
+        if (cardRef.current) {
+             observer.observe(cardRef.current, { attributes: true, childList: true, subtree: true });
+        }
+
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', updateHeight);
+            observer.disconnect();
+        };
+    }, []);
+
+    // Tentukan apakah garis harus digambar (jangan gambar untuk item terakhir)
+    const shouldDrawLine = !isLast; 
+
+    // Tentukan tinggi garis untuk Desktop secara dinamis
+    const desktopLineHeight = cardHeight > 0 ? `${cardHeight - PIN_HEIGHT_DESKTOP}px` : `300px`; // Fallback 300px
+    const mobileLineHeight = cardHeight > 0 ? `${cardHeight - PIN_HEIGHT_MOBILE}px` : `300px`; // Fallback 300px
 
     // Posisi awal garis (top) untuk semua item: tepat di bawah pin.
     const desktopLineTop = PIN_HEIGHT_DESKTOP;
@@ -64,21 +76,28 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
             
             <div className={`w-full relative`}> 
                 
-                <div className="flex flex-col w-full max-w-[325px] max-h-[500px] overflow-y-auto 
-    md:max-w-[520px] md:max-h-none md:overflow-visible 
-    rounded-xl shadow-2xl bg-white border border-gray mx-4 md:mx-0 md:ml-6">     
-    
-                    {/* Gambar */}
+                <div 
+                    ref={cardRef} // Pasang ref di sini untuk mengukur tinggi
+                    className="flex flex-col w-full max-w-[325px] 
+                    md:max-w-[520px] 
+                    rounded-xl shadow-2xl bg-white border border-gray mx-auto md:mx-0 md:ml-6" // mx-auto untuk pusatkan di mobile
+                > 
+                    
+                    {/* Gambar Container */}
                     <div className="w-full p-[10px] pb-4"> 
-                        <img
-                            src={imageUrl}
-                            alt={title}
-                            className="w-full max-w-[500px] h-[281px] object-cover shadow-md rounded-xl" 
-                        />
+                        <div className="relative pt-[56.25%]"> {/* Aspect Ratio 16:9 - 9/16 = 0.5625 (56.25%) */}
+                            <img
+                                src={imageUrl}
+                                alt={title}
+                                // Ubah height statis menjadi absolut di dalam container rasio aspek
+                                className="absolute top-0 left-0 w-full h-full object-cover shadow-md rounded-xl" 
+                                loading="lazy"
+                            />
+                        </div>
                     </div>
 
                     {/* Deskripsi Teks */}
-                    <div className="w-full flex flex-col justify-center text-left px-[20px] pb-[16px] pt-0"> 
+                    <div className="w-full flex flex-col justify-center text-left px-[20px] pb-[20px] pt-0"> 
                         <p className="text-xs font-medium text-gray-500 mb-1 text-left" style={{fontFamily: "Markazi Text, serif"}}>{date}</p> 
                         
                         <h3 className="text-xl font-serif text-gray-900 mb-3 text-left" style={{fontFamily: "Markazi Text, serif"}}>{title}</h3> 
@@ -94,14 +113,13 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     className={`absolute top-0 hidden md:block`} 
                     style={{ left: PIN_PULL_LEFT_DESKTOP }} 
                 > 
-                    {/* Ganti border-[#37474f] menjadi border-white. Warna icon tetap text-[#37474f] */}
                     <div className="bg-white border-2 border-white rounded-full w-8 h-8 flex items-center justify-center relative z-10 shadow-md">
                         <svg className="w-4 h-4 text-[#37474f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
 
-                    {/* GARIS VERTIKAL DESKTOP */}
+                    {/* GARIS VERTIKAL DESKTOP - Tinggi dinamis */}
                     {shouldDrawLine && (
                         <div 
                             className="absolute w-0.5 bg-white z-0" 
@@ -119,14 +137,13 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     className={`absolute top-0 md:hidden z-10`} 
                     style={{left: PIN_PULL_LEFT_MOBILE}}
                 >
-                    {/* Ganti border-[#37474f] menjadi border-white. Warna icon tetap text-[#37474f] */}
                     <div className="bg-white border-2 border-white rounded-full w-6 h-6 flex items-center justify-center relative shadow-sm">
                         <svg className="w-4 h-4 text-[#37474f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
                     
-                    {/* GARIS VERTIKAL MOBILE */}
+                    {/* GARIS VERTIKAL MOBILE - Tinggi dinamis */}
                     {shouldDrawLine && (
                         <div 
                             className="absolute w-0.5 bg-white z-0" 
@@ -146,7 +163,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 
 
 // -------------------------------------------------------------------------------- //
-// --- Komponen Utama Story (Tidak ada perubahan) ---
+// --- Komponen Utama Story ---
 // -------------------------------------------------------------------------------- //
 const Story: React.FC = () => {
     const loveStoryEvents = [
@@ -193,7 +210,8 @@ const Story: React.FC = () => {
                     {loveStoryEvents.map((event, index) => (
                         <TimelineItem
                             key={index}
-                            index={index} 
+                            // index={index} <-- DIHAPUS DARI PEMANGGILAN
+                            isLast={index === loveStoryEvents.length - 1} // Kirim prop isLast
                             date={event.date}
                             title={event.title}
                             description={event.description}
