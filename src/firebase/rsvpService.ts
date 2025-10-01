@@ -1,67 +1,91 @@
 import { 
-  getFirestore, 
-  collection, 
-  addDoc, 
-  getDocs,
-  query,
-  orderBy,
-  limit,
-  serverTimestamp,
-  Timestamp 
+    collection, 
+    addDoc, 
+    getDocs, 
+    Timestamp 
 } from 'firebase/firestore';
-import app from './config';
 
-// Initialize Firestore
-const db = getFirestore(app);
+// Variabel global yang disediakan oleh lingkungan Canvas (dideklarasikan untuk TypeScript)
+declare const db: any;
+declare const __app_id: string;
 
-// Define RSVP type
-export interface RSVPData {
-  id?: string;
-  name: string;
-  email: string;
-  attendance: 'yes' | 'no' | 'maybe';
-  guests: number;
-  message: string;
-  createdAt?: Date | Timestamp; // Support both Date and Timestamp for compatibility
+// --- 1. Definisi Tipe Data (RsvpData) ---
+/**
+ * Interface untuk data RSVP yang disimpan di Firestore.
+ */
+export interface RsvpData {
+    id?: string; // ID dokumen Firestore (opsional saat membuat)
+    name: string;
+    email: string; 
+    attendance: 'yes' | 'no' | 'maybe';
+    guests: number;
+    message: string;
+    createdAt?: Timestamp; // Waktu pembuatan dokumen
+    userId?: string; // ID pengguna yang membuat dokumen
 }
 
-// Add RSVP to Firestore
-export const addRSVP = async (rsvpData: Omit<RSVPData, 'id' | 'createdAt'>): Promise<string> => {
-  try {
-    const docRef = await addDoc(collection(db, 'rsvps'), {
-      ...rsvpData,
-      createdAt: serverTimestamp(),
-    });
-    return docRef.id;
-  } catch (error) {
-    console.error('Error adding RSVP: ', error);
-    throw error;
-  }
+// --- 2. Fungsi Menambahkan RSVP (addRSVP) ---
+/**
+ * Menambahkan dokumen RSVP baru ke koleksi 'rsvps' publik.
+ * @param data - Data RSVP yang akan disimpan.
+ * @param userId - ID pengguna saat ini untuk identifikasi.
+ */
+export const addRSVP = async (data: RsvpData, userId: string): Promise<void> => {
+    if (!db) {
+        throw new Error("Database not initialized.");
+    }
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    // Menggunakan path koleksi publik
+    const rsvpCollectionRef = collection(db, `artifacts/${appId}/public/data/rsvps`);
+
+    // Memastikan nilai attendance valid sebelum menyimpan
+    const attendanceValue = (['yes', 'no', 'maybe'] as const).includes(data.attendance) 
+                            ? data.attendance 
+                            : 'no';
+
+    try {
+        await addDoc(rsvpCollectionRef, {
+            ...data,
+            attendance: attendanceValue,
+            userId: userId, 
+            createdAt: Timestamp.now(), 
+        });
+    } catch (error) {
+        console.error("Error adding document to Firestore:", error);
+        throw error;
+    }
 };
 
-// Get all RSVPs from Firestore
-export const getRSVPs = async (): Promise<RSVPData[]> => {
-  try {
-    const q = query(collection(db, 'rsvps'), orderBy('createdAt', 'desc'), limit(100));
-    const querySnapshot = await getDocs(q);
+// --- 3. Fungsi Mengambil RSVP (getRSVPs) ---
+/**
+ * Mengambil semua RSVP dari koleksi 'rsvps' publik.
+ * @returns Array objek RsvpData.
+ */
+export const getRSVPs = async (): Promise<RsvpData[]> => {
+    if (!db) return [];
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const rsvpCollectionRef = collection(db, `artifacts/${appId}/public/data/rsvps`);
     
-    const rsvps: RSVPData[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      rsvps.push({
-        id: doc.id,
-        name: data.name,
-        email: data.email,
-        attendance: data.attendance,
-        guests: data.guests,
-        message: data.message,
-        createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
-      });
-    });
-    
-    return rsvps;
-  } catch (error) {
-    console.error('Error getting RSVPs: ', error);
-    throw error;
-  }
+    try {
+        const snapshot = await getDocs(rsvpCollectionRef);
+        
+        let rsvps: RsvpData[] = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data() as RsvpData, // Casting data ke RsvpData
+        }));
+        
+        // Sortir dalam memori (DESC: terbaru di atas) karena menghindari orderBy() di query
+        rsvps.sort((a, b) => {
+            const timeA = a.createdAt?.toMillis() || 0;
+            const timeB = b.createdAt?.toMillis() || 0;
+            return timeB - timeA;
+        });
+
+        return rsvps;
+
+    } catch (error) {
+        console.error("Error fetching messages from Firestore:", error);
+        return [];
+    }
 };
