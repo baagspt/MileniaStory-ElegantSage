@@ -1,0 +1,5 @@
+// Sample wedding song for the background music player
+// Replace this with your own audio file
+
+// This is a placeholder file to indicate where the audio should be placed
+// The actual wedding-song.mp3 file should be placed in the audio folder

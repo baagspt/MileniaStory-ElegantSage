@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milenia Elegant</title>
+    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Import elegant fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Music Control -->
+    <audio id="bg-music" loop>
+        <source src="audio/wedding-music.mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+    
+    <!-- Floating Music Control -->
+    <div class="music-control">
+        <button id="music-toggle" class="music-btn" title="Toggle Music">
+            <span class="music-icon">♪</span>
+        </button>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader">
+            <div class="leaf-icon"></div>
+            <p>Memuat Undangan...</p>
+        </div>
+    </div>
+    
+    <!-- Cover Screen -->
+    <section id="cover" class="cover-screen">
+        <div class="cover-content">
+            <div class="ornament-top">
+                <div class="floral-border"></div>
+            </div>
+            
+            <h1 class="couple-names">
+                <span class="bride-name">Memey</span> & <span class="groom-name">Budi</span>
+            </h1>
+            
+            <p class="wedding-date">12.08.2025</p>
+            
+            <div class="greeting">
+                <p>Kepada Yth. <span id="guest-name">Tamu Undangan</span></p>
+            </div>
+            
+            <button id="open-invitation" class="btn-open-invitation">Buka Undangan</button>
+            
+            <div class="ornament-bottom">
+                <div class="floral-border"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Couple Section -->
+    <section id="couple" class="section couple-section">
+        <div class="container">
+            <h2 class="section-title">The Couple</h2>
+            
+            <div class="couple-grid">
+                <div class="couple-card bride-card">
+                    <div class="couple-photo">
+                        <img src="images/bride.jpg" alt="Foto Mempelai Wanita">
+                    </div>
+                    <h3 class="couple-name">Memey</h3>
+                    <p class="couple-nickname">Putri dari</p>
+                    <p class="parents-name">Bapak Santoso & Ibu Siti</p>
+                    <div class="quote">
+                        "Dan di antara tanda-tanda kekuasaan-Nya ialah diciptakan-Nya untukmu pasangan hidup dari jenismu sendiri, supaya kamu mendapatkan ketenangan hati dan dijadikan-Nya kasih sayang di antara kamu."
+                    </div>
+                </div>
+                
+                <div class="symbol-separator">
+                    <div class="love-symbol"> &hearts; </div>
+                </div>
+                
+                <div class="couple-card groom-card">
+                    <div class="couple-photo">
+                        <img src="images/groom.jpg" alt="Foto Mempelai Pria">
+                    </div>
+                    <h3 class="couple-name">Budi</h3>
+                    <p class="couple-nickname">Putra dari</p>
+                    <p class="parents-name">Bapak Joko & Ibu Ani</p>
+                    <div class="quote">
+                        "Marriage is not just spiritual communion and passionate embraces; marriage is also three meals a day, sharing the workload and remembering to carry out the trash."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Event Details Section -->
+    <section id="events" class="section events-section">
+        <div class="container">
+            <h2 class="section-title">Acara Pernikahan</h2>
+            
+            <div class="events-container">
+                <div class="event-card">
+                    <h3>Akad Nikah</h3>
+                    <div class="event-detail">
+                        <p class="event-date">Sabtu, 12 Agustus 2025</p>
+                        <p class="event-time">08:00 WIB</p>
+                        <p class="event-location">Masjid Agung Al-Muhajirin</p>
+                        <p class="event-address">Jl. Merdeka No. 123, Jakarta</p>
+                    </div>
+                    <a href="#" class="btn-map" target="_blank">Lihat Lokasi di Google Maps</a>
+                </div>
+                
+                <div class="event-card">
+                    <h3>Resepsi</h3>
+                    <div class="event-detail">
+                        <p class="event-date">Sabtu, 12 Agustus 2025</p>
+                        <p class="event-time">11:00 WIB - Selesai</p>
+                        <p class="event-location">Ballroom Grand Ballroom</p>
+                        <p class="event-address">Jl. Sudirman No. 456, Jakarta</p>
+                    </div>
+                    <a href="#" class="btn-map" target="_blank">Lihat Lokasi di Google Maps</a>
+                </div>
+            </div>
+            
+            <div class="countdown-container">
+                <h3>Countdown Pernikahan</h3>
+                <div id="countdown" class="countdown">
+                    <div class="countdown-item">
+                        <span id="days">00</span>
+                        <p>Hari</p>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="hours">00</span>
+                        <p> Jam</p>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="minutes">00</span>
+                        <p>Menit</p>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="seconds">00</span>
+                        <p>Detik</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Our Story Section -->
+    <section id="story" class="section story-section">
+        <div class="container">
+            <h2 class="section-title">Our Story</h2>
+            
+            <div class="story-timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Juni 2020</div>
+                    <div class="timeline-content">
+                        <h3>Pertemuan Pertama</h3>
+                        <p>Kami pertama kali bertemu di sebuah acara teman bersama dan langsung merasa cocok satu sama lain.</p>
+                        <div class="timeline-image">
+                            <img src="images/meet.jpg" alt="Pertemuan Pertama">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Desember 2022</div>
+                    <div class="timeline-content">
+                        <h3>Lamaran</h3>
+                        <p>Setelah dua tahun menjalin hubungan, Budi melamar Memey dengan cincin pilihan khusus.</p>
+                        <div class="timeline-image">
+                            <img src="images/proposal.jpg" alt="Lamaran">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Agustus 2025</div>
+                    <div class="timeline-content">
+                        <h3>Pernikahan</h3>
+                        <p>Kami akan resmi menjadi suami istri dalam pernikahan yang akan kami selenggarakan di Masjid Agung.</p>
+                        <div class="timeline-image">
+                            <img src="images/prewedding.jpg" alt="Prewedding">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Gallery Section -->
+    <section id="gallery" class="section gallery-section">
+        <div class="container">
+            <h2 class="section-title">Gallery</h2>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="images/gallery1.jpg" alt="Gallery 1">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery2.jpg" alt="Gallery 2">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery3.jpg" alt="Gallery 3">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery4.jpg" alt="Gallery 4">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery5.jpg" alt="Gallery 5">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery6.jpg" alt="Gallery 6">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery7.jpg" alt="Gallery 7">
+                </div>
+                <div class="gallery-item">
+                    <img src="images/gallery8.jpg" alt="Gallery 8">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Health Protocol Section -->
+    <section id="protocol" class="section protocol-section">
+        <div class="container">
+            <h2 class="section-title">Protokol Kesehatan</h2>
+            
+            <div class="protocol-content">
+                <p>Mengingat situasi kesehatan saat ini, kami mohon kerjasama dari para tamu undangan untuk mematuhi protokol kesehatan berikut:</p>
+                
+                <ul class="protocol-list">
+                    <li>Menggunakan masker selama acara</li>
+                    <li>Mencuci tangan sebelum memasuki venue</li>
+                    <li>Menjaga jarak aman dengan tamu lain</li>
+                    <li>Tidak hadir jika merasa tidak sehat</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Digital Envelope Section -->
+    <section id="envelope" class="section envelope-section">
+        <div class="container">
+            <h2 class="section-title">Amplop Digital</h2>
+            
+            <div class="envelope-content">
+                <p>Sebagai bentuk penghargaan dan rasa hormat, kami persilakan Bapak/Ibu/Saudara/i memberikan doa restu dan memberikan tanda kasih melalui transfer ke rekening berikut:</p>
+                
+                <div class="bank-details">
+                    <div class="bank-card">
+                        <h4>BCA</h4>
+                        <p class="account-number">1234567890</p>
+                        <p class="account-name">a/n Memey & Budi</p>
+                        <button class="btn-copy" onclick="copyAccount('1234567890')">Salin Nomor Rekening</button>
+                    </div>
+                    
+                    <div class="bank-card">
+                        <h4>Mandiri</h4>
+                        <p class="account-number">0987654321</p>
+                        <p class="account-name">a/n Memey & Budi</p>
+                        <button class="btn-copy" onclick="copyAccount('0987654321')">Salin Nomor Rekening</button>
+                    </div>
+                </div>
+                
+                <div class="gift-address">
+                    <h4>Alamat Pengiriman Hadiah</h4>
+                    <p>Jl. Merdeka No. 123, Jakarta</p>
+                    <p>Kepada: Bapak Joko & Ibu Ani</p>
+                    <p>HP: 081234567890</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Guest Book Section -->
+    <section id="guestbook" class="section guestbook-section">
+        <div class="container">
+            <h2 class="section-title">Buku Tamu & Doa</h2>
+            
+            <div class="guestbook-content">
+                <form id="rsvp-form" class="rsvp-form">
+                    <div class="form-group">
+                        <label for="name">Nama</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Apakah Anda akan hadir?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="yes" required> Ya, saya akan hadir
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="no"> Maaf, saya tidak bisa hadir
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="attendance" value="maybe"> Belum pasti
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Ucapan & Doa</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Tulis ucapan dan doa Anda di sini..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">Kirim Ucapan</button>
+                </form>
+                
+                <div class="guest-messages">
+                    <h3>Ucapan & Doa Terkirim</h3>
+                    <div id="messages-list" class="messages-list">
+                        <!-- Messages will be loaded here dynamically -->
+                        <div class="message-item">
+                            <div class="message-header">
+                                <strong>Taufik Hidayat</strong>
+                                <span class="attendance-status yes">Hadir</span>
+                            </div>
+                            <p>Semoga pernikahan kalian penuh berkah dan kebahagiaan. Selamat menempuh hidup baru!</p>
+                        </div>
+                        
+                        <div class="message-item">
+                            <div class="message-header">
+                                <strong>Siti Nurhaliza</strong>
+                                <span class="attendance-status no">Tidak Hadir</span>
+                            </div>
+                            <p>Maaf tidak bisa hadir, doa kami menyertaimu. Semoga langgeng hingga akhir hayat.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Dibuat dengan penuh cinta oleh Memey & Budi &copy; 2025</p>
+        </div>
+    </footer>
+    
+    <script src="js/main.js"></script>
+</body>
+</html>
