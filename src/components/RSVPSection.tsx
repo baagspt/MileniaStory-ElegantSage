@@ -36,8 +36,12 @@ const RSVPSection: React.FC = () => {
             return;
         }
 
+        let isMounted = true; // Untuk mencegah state update pada komponen yang sudah unmount
+
         // Listener status autentikasi untuk mendapatkan UID pengguna
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!isMounted) return; // Pastikan komponen masih mounted
+            
             if (user) {
                 // User sudah terautentikasi (melalui token atau anonim)
                 setUserId(user.uid);
@@ -50,15 +54,21 @@ const RSVPSection: React.FC = () => {
                 } catch (error) {
                     console.error("Firebase authentication error:", error);
                     setSubmitStatus("Error: Gagal otentikasi. Cek konfigurasi Firebase.");
-                    setUserId(crypto.randomUUID()); // Fallback ke UUID acak
+                    // Fallback ke UUID acak (mendukung browser lama)
+                    setUserId(typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15));
                 } finally {
-                    setIsAuthReady(true);
+                    if (isMounted) {
+                        setIsAuthReady(true);
+                    }
                 }
             }
         });
 
         // Cleanup listener
-        return () => unsubscribe();
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
