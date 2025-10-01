@@ -93,7 +93,8 @@ const RSVPSection: React.FC = () => {
                     fetchedMessages.push({
                         id: doc.id,
                         name: data.name || 'Anonim',
-                        attendance: (data.attendance as 'yes' | 'no' | 'maybe') || 'maybe',
+                        // Memastikan tipe attendance sesuai, fallback ke 'maybe' jika tidak valid
+                        attendance: (['yes', 'no'].includes(data.attendance) ? data.attendance : 'maybe') as 'yes' | 'no' | 'maybe',
                         message: data.message || 'Tidak ada pesan',
                         createdAt: data.createdAt instanceof Timestamp ? data.createdAt : null,
                         userId: data.userId || 'unknown',
@@ -146,7 +147,7 @@ const RSVPSection: React.FC = () => {
                 name: guestName.trim(),
                 userId: userId, // ID unik dari Auth
                 attendance: attendance as 'yes' | 'no' | 'maybe',
-                guests: 1, // Diabaikan dalam UI ini, tapi penting untuk data
+                guests: 1, // Default guest count
                 message: message.trim(),
                 createdAt: Timestamp.now(), // Tambahkan timestamp server
             };
@@ -157,7 +158,8 @@ const RSVPSection: React.FC = () => {
             setGuestName('');
             setAttendance('');
             setMessage('');
-            setSubmitStatus("Berhasil Dikirim! Terima kasih.");
+            // Karena onSnapshot aktif, pesan akan otomatis ter-update.
+            setSubmitStatus("Berhasil Dikirim! Terima kasih. Ucapan Anda akan segera muncul.");
 
         } catch (error) {
             console.error("Error menambahkan dokumen:", error);
@@ -170,7 +172,7 @@ const RSVPSection: React.FC = () => {
         if (!timestamp) return 'Baru saja';
         try {
             const date = timestamp.toDate();
-            // Format Indonesia: DD/MM/YYYY HH:MM
+            // Format Indonesia: Tgl Bln Thn, Jam:Menit
             return date.toLocaleString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         } catch (e) {
             return 'Baru saja';
@@ -180,81 +182,76 @@ const RSVPSection: React.FC = () => {
     // UI Rendering
     return (
         <div className="min-h-screen">
-            <script src="https://cdn.tailwindcss.com"></script>
+            {/* Hapus script tag tailwind.css di sini jika Anda menggunakan framework yang sudah terintegrasi */}
+            {/* <script src="https://cdn.tailwindcss.com"></script> */}
             <style>
+                {/* Impor font dari Google Fonts */}
                 {`
                     @import url('https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400..700&family=Inter:wght@100..900&display=swap');
 
-                    /* Font untuk judul dan elemen dekoratif */
+                    /* Font untuk judul dan elemen dekoratif - Diubah ke Markazi Text */
                     .font-markazi {
                         font-family: 'Markazi Text', serif;
                         font-optical-sizing: auto;
-                        font-weight: 500;
+                        font-weight: 500; /* Disesuaikan agar tebal */
                     }
-                    /* Font default untuk teks biasa */
+                    /* Font default untuk teks biasa - Diubah ke Inter */
                     * {
                         font-family: 'Inter', sans-serif;
                     }
-                    /* Custom scrollbar untuk tampilan yang lebih baik */
-                    .scroll-container::-webkit-scrollbar {
-                        width: 8px;
-                    }
-                    .scroll-container::-webkit-scrollbar-thumb {
-                        background-color: #607d8b; /* Warna abu-abu kebiruan */
-                        border-radius: 4px;
-                    }
+
+                    /* Menggantikan semua style inline style={{fontFamily: "Markazi Text, serif"}} dengan class 'font-markazi' jika sesuai konteks */
                 `}
             </style>
             
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             
-            {/* Background utama abu-abu kebiruan */}
+            {/* Latar belakang keseluruhan dipertahankan (#90a4ae) */}
             <section className="py-12 md:py-20 bg-[#90a4ae] min-h-screen flex items-center justify-center"> 
                 <div className="container mx-auto px-4 w-full max-w-4xl">
                     
+                    {/* Header */}
                     <div className="text-center mb-10">
                         <div className="mb-4">
-                            {/* Placeholder/Icon untuk Doa Restu */}
-                            <img 
-                                src="https://placehold.co/280x80/607d8b/ffffff?text=Doa+Restu" 
-                                alt="Doa Restu Placeholder" 
-                                className="mx-auto max-w-[200px] md:max-w-[280px] rounded-lg shadow-lg"
-                                onError={(e) => e.currentTarget.style.display = 'none'}
-                            />
+                        {/* Menggunakan URL/Path gambar dari skrip pertama */}
+                        <img 
+                            src="/assets/images/doa.png" 
+                            alt="Doa" 
+                            className="mx-auto max-w-[200px] md:max-w-[280px]"
+                            onError={(e) => e.currentTarget.style.display = 'none'} // Fallback jika gambar tidak ditemukan
+                        />
                         </div>
                         
-                        <p className="text-xl text-white max-w-2xl mx-auto tracking-wider font-markazi text-3xl md:text-4xl leading-snug">
+                        {/* Teks konfirmasi diubah menjadi putih (text-white) & menggunakan style skrip pertama */}
+                        <p className="text-l text-white max-w-2xl mx-auto tracking-wider font-markazi">
                             Tolooong konfirmasi kehadiran sebelum tanggal 02 Februari 2025
                         </p>
                     </div>
 
                     {/* Status Message */}
                     {submitStatus && (
-                        <div className={`max-w-2xl mx-auto mb-6 p-4 rounded-xl text-center font-semibold text-base md:text-lg ${submitStatus.toLowerCase().includes('error') ? 'bg-red-500 text-white shadow-xl' : 'bg-green-500 text-white shadow-xl'}`}>
+                        <div className={`max-w-2xl mx-auto mb-4 p-4 rounded-lg text-center font-medium text-base ${submitStatus.toLowerCase().includes('error') ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
                             {submitStatus}
                         </div>
                     )}
                     
-                    {/* User ID */}
-                    <div className='text-center mb-8'>
-                        <p className="text-xs text-center text-white opacity-80 mb-1">
-                            ID Sesi (Publik):
-                        </p>
-                        <p className='font-mono bg-white bg-opacity-10 p-2 rounded-md inline-block text-white text-xs break-all shadow-md'>
-                            {userId ? userId : 'Connecting...'}
-                        </p>
-                    </div>
+                    {/* User ID - Disesuaikan dengan style skrip pertama */}
+                    <p className="text-sm text-center text-white mb-6">
+                        User ID: <span className='font-mono bg-white bg-opacity-10 p-1 rounded-md'>{userId ? userId : 'Connecting...'}</span>
+                    </p>
 
 
                     {/* Form Card */}
                     <div 
-                        className="max-w-2xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border-t-8 border-[#455a64]"
+                        // Latar belakang card: putih (bg-white), shadow & border disesuaikan
+                        className="max-w-2xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl"
                     >
-                        <h1 className="font-bold text-gray-700 mb-8 text-center font-markazi text-4xl">Konfirmasi & Ucapan</h1>
+                        <h1 className="font-bold text-gray-700 mb-6 text-center font-markazi text-3xl md:text-4xl">Konfirmasi & Ucapan</h1>
                         <form onSubmit={handleSubmit}>
                             {/* Nama */}
                             <div className="mb-6">
-                                <label htmlFor="name" className="block text-gray-700 mb-2 font-semibold text-xl font-markazi">
+                                {/* Label menggunakan style skrip pertama */}
+                                <label htmlFor="name" className="block text-gray-700 mb-2 font-semibold text-sm md:text-base font-markazi">
                                     Nama Anda
                                 </label>
                                 <input
@@ -262,54 +259,59 @@ const RSVPSection: React.FC = () => {
                                     id="name"
                                     value={guestName}
                                     onChange={(e) => setGuestName(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-base text-gray-800 transition shadow-inner"
-                                    placeholder="Masukkan Nama Anda"
+                                    // Input menggunakan style skrip pertama
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-sm md:text-base text-black transition"
+                                    placeholder="Tamu Undangan"
                                     required
                                 />
                             </div>
                             
                             {/* Attendance */}
                             <div className="mb-6">
-                                <p className="text-gray-700 mb-3 font-semibold text-xl font-markazi">Apakah anda akan hadir?</p>
-                                <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-3 sm:space-y-0">
+                                {/* P menggunakan style skrip pertama */}
+                                <p className="text-gray-700 mb-3 font-semibold text-sm md:text-base font-markazi">Apakah anda akan hadir?</p>
+                                <div className="flex space-x-6">
                                     {/* Ya */}
-                                    <label htmlFor="attending-yes" className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition duration-150 cursor-pointer w-full sm:w-1/2">
+                                    <div className="flex items-center">
                                         <input
                                             type="radio"
                                             id="attending-yes"
                                             name="attendance"
-                                            value="yes"
                                             checked={attendance === 'yes'}
                                             onChange={() => setAttendance('yes')}
-                                            className="mr-3 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64] checked:bg-[#455a64] checked:border-transparent"
+                                            // Radio menggunakan style skrip pertama
+                                            className="mr-2 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64]"
                                             required
                                         />
-                                        <span className="text-gray-700 text-lg font-markazi">
+                                        {/* Label Radio menggunakan style skrip pertama */}
+                                        <label htmlFor="attending-yes" className="text-gray-700 text-sm md:text-base font-markazi">
                                             Ya, saya akan hadir.
-                                        </span>
-                                    </label>
+                                        </label>
+                                    </div>
                                     {/* Tidak */}
-                                    <label htmlFor="attending-no" className="flex items-center bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition duration-150 cursor-pointer w-full sm:w-1/2">
+                                    <div className="flex items-center">
                                         <input
                                             type="radio"
                                             id="attending-no"
                                             name="attendance"
-                                            value="no"
                                             checked={attendance === 'no'}
                                             onChange={() => setAttendance('no')}
-                                            className="mr-3 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64] checked:bg-[#455a64] checked:border-transparent"
+                                            // Radio menggunakan style skrip pertama
+                                            className="mr-2 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64]"
                                             required
                                         />
-                                        <span className="text-gray-700 text-lg font-markazi">
+                                        {/* Label Radio menggunakan style skrip pertama */}
+                                        <label htmlFor="attending-no" className="text-gray-700 text-sm md:text-base font-markazi">
                                             Tidak, saya tidak akan hadir.
-                                        </span>
-                                    </label>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Pesan */}
                             <div className="mb-8">
-                                <label htmlFor="message" className="block text-gray-700 mb-2 font-semibold text-xl font-markazi"> 
+                                {/* Label menggunakan style skrip pertama */}
+                                <label htmlFor="message" className="block text-gray-700 mb-2 font-semibold text-sm md:text-base font-markazi"> 
                                     Pesan (Ucapan & Doa)
                                 </label>
                                 <textarea
@@ -317,7 +319,8 @@ const RSVPSection: React.FC = () => {
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-base text-gray-800 transition shadow-inner"
+                                    // Textarea menggunakan style skrip pertama
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-sm md:text-base text-black transition"
                                     placeholder="Bagikan Ucapan Kepada Mempelai" 
                                     required
                                 ></textarea>
@@ -326,50 +329,54 @@ const RSVPSection: React.FC = () => {
                             {/* Tombol */}
                             <button
                                 type="submit"
-                                // Tombol dinonaktifkan jika otentikasi belum siap atau userId belum ada
-                                disabled={!isAuthReady || isLoadingMessages || !userId} 
-                                className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-xl hover:shadow-2xl text-lg"
+                                disabled={!isAuthReady || isLoadingMessages} // Menggunakan isAuthReady dari skrip kedua
+                                // Warna tombol #455a64 (default) dan hover gray-700
+                                className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                             >
-                                {isAuthReady && !isLoadingMessages && userId ? "Kirim Ucapan dan Doa" : "Menghubungkan..."}
+                                {isAuthReady ? "Kirim Ucapan dan Doa" : "Connecting..."}
                             </button>
                         </form>
                     </div>
 
                     {/* Daftar Ucapan */}
-                    <div className="max-w-2xl mx-auto mt-12">
-                        <h3 className="text-4xl font-bold text-white mb-8 text-center font-markazi">
-                            Ucapan & Doa Restu ({messages.length})
-                        </h3>
-                        {isLoadingMessages && messages.length === 0 ? (
-                            <p className="text-center text-white p-4 bg-gray-700 bg-opacity-30 rounded-xl shadow-lg">Memuat pesan...</p>
-                        ) : (
-                            <ul className="space-y-6 max-h-[500px] overflow-y-auto scroll-container">
-                                {messages.map((msg) => (
-                                    <li key={msg.id} className="bg-white p-5 rounded-xl shadow-2xl border-l-8 border-[#455a64] break-words">
-                                        <div className='flex justify-between items-start mb-2'>
-                                            <p className="font-bold text-2xl text-[#455a64] font-markazi leading-none">
-                                                {msg.name} 
+                    {(messages.length > 0 || isLoadingMessages) && (
+                        <div className="max-w-2xl mx-auto mt-12">
+                            {/* Judul Messages diubah menjadi putih (text-white) & menggunakan font-markazi */}
+                            <h3 className="text-3xl font-bold text-white mb-6 text-center font-markazi">
+                                Ucapan & Doa Restu ({messages.length})
+                            </h3>
+                            
+                            {isLoadingMessages && messages.length === 0 ? (
+                                <div className='text-center text-white text-lg font-medium'>Memuat ucapan...</div>
+                            ) : (
+                                <ul className="space-y-4 max-h-[500px] overflow-y-auto p-2 scroll-container">
+                                    {messages.map((msg) => (
+                                        // Card Ucapan disesuaikan dengan skrip pertama
+                                        <li key={msg.id} className="bg-white p-5 rounded-xl shadow-xl border-t-8 border-[#455a64]/80">
+                                            <div className='flex justify-between items-start mb-2'>
+                                                <p className="font-bold text-xl text-[#455a64] font-markazi">
+                                                    {msg.name} 
+                                                </p>
+                                                <span className={`ml-4 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider ${msg.attendance === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                    {/* Menampilkan status kehadiran */}
+                                                    {msg.attendance === 'yes' ? 'Hadir' : (msg.attendance === 'no' ? 'Tidak Hadir' : 'Maybe')}
+                                                </span>
+                                            </div>
+                                            
+                                            <p className="text-gray-700 text-base italic leading-relaxed mb-3 font-markazi">
+                                                "{msg.message}"
                                             </p>
-                                            <span className={`ml-4 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm ${msg.attendance === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                {msg.attendance === 'yes' ? 'Hadir' : 'Tidak Hadir'}
-                                            </span>
-                                        </div>
-                                        
-                                        <p className="text-gray-700 text-lg italic leading-relaxed mb-3 font-markazi whitespace-pre-wrap">
-                                            "{msg.message}"
-                                        </p>
-                                        
-                                        <p className="text-xs text-gray-500 mt-3 text-right border-t pt-2">
-                                            {formatTimestamp(msg.createdAt)}
-                                        </p>
-                                    </li>
-                                ))}
-                                {messages.length === 0 && !isLoadingMessages && (
-                                    <p className="text-center text-white p-4 bg-gray-700 bg-opacity-30 rounded-xl shadow-lg font-semibold">Belum ada ucapan. Jadilah yang pertama!</p>
-                                )}
-                            </ul>
-                        )}
-                    </div>
+                                            
+                                            <p className="text-xs text-gray-500 mt-2 text-right border-t pt-2">
+                                                {/* Menggunakan utilitas formatTimestamp dari skrip kedua */}
+                                                {formatTimestamp(msg.createdAt)}
+                                            </p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    )}
                 </div>
             </section>
         </div>
