@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth'; 
-import { auth, db } from '../firebase/config'; // Pastikan path ini benar!
+import { auth, db } from '../firebase/config';
 import { 
     collection, query, onSnapshot, addDoc, 
     Timestamp, orderBy, CollectionReference, DocumentData, 
@@ -14,21 +14,25 @@ interface RsvpData {
     attendance: 'yes' | 'no' | 'maybe';
     message: string;
     createdAt: Timestamp | null;
-    userId: string; // ID pengguna yang membuat pesan
+    userId: string;
 }
 
+// Konstanta untuk batas tampilan awal dan langkah pemuatan
+const INITIAL_LIMIT = 5; // <--- DIUBAH MENJADI 5
+const LOAD_MORE_STEP = 5;  // <--- DIUBAH MENJADI 5
+
 // Komponen Utama Aplikasi
-const RSVPSection: React.FC = () => {
+const RSVPSection: FC = () => {
     // --- State Management ---
     const [guestName, setGuestName] = useState<string>('');
     const [attendance, setAttendance] = useState<'yes' | 'no' | ''>('');
     const [messages, setMessages] = useState<RsvpData[]>([]); 
     const [message, setMessage] = useState<string>('');
-    // State userId tetap dipertahankan untuk kebutuhan Auth dan Logic
     const [userId, setUserId] = useState<string | null>(null); 
     const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
     const [submitStatus, setSubmitStatus] = useState<string>('Menghubungkan ke database...');
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(true);
+    const [displayLimit, setDisplayLimit] = useState(INITIAL_LIMIT); // State untuk mengontrol batas tampilan
 
     const PUBLIC_COLLECTION_PATH = `rsvps`;
 
@@ -41,20 +45,16 @@ const RSVPSection: React.FC = () => {
         }
         return '';
     };
-    
+
     // Fungsi Otentikasi dan Pengaturan State
     const handleAuth = async (initialUser: User | null) => {
         try {
             let user: User | null = initialUser;
-
             if (!user) {
-                // Jika belum ada user, lakukan sign-in anonim
                 const result = await signInAnonymously(auth);
                 user = result.user;
             }
-
             if (user) {
-                // KRUSIAL: Set userId dan status setelah Auth berhasil
                 setUserId(user.uid);
                 setSubmitStatus("Tersambung dan siap.");
             } else {
@@ -64,7 +64,6 @@ const RSVPSection: React.FC = () => {
             console.error("Firebase authentication error:", error);
             setSubmitStatus("Error: Gagal otentikasi. Cek konfigurasi Firebase Auth.");
         } finally {
-            // Setelah semua upaya Auth, set AuthReady = true
             setIsAuthReady(true);
         }
     };
@@ -75,23 +74,18 @@ const RSVPSection: React.FC = () => {
         if (urlName) {
             setGuestName(urlName);
         }
-
         if (!auth) {
             setSubmitStatus("Error: Firebase Auth tidak diinisialisasi.");
             setIsAuthReady(true);
             return;
         }
-
         let isMounted = true; 
-
-        // Listener untuk otentikasi
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (!isMounted) return;
             if (!isAuthReady) { 
                 handleAuth(user);
             }
         });
-
         return () => {
             isMounted = false;
             unsubscribe();
@@ -101,7 +95,6 @@ const RSVPSection: React.FC = () => {
 
     // 2. Mendengarkan Pesan Secara Real-time (onSnapshot)
     useEffect(() => {
-        // Tunggu hingga isAuthReady TRUE dan db siap
         if (!isAuthReady || !db) return;
         
         setIsLoadingMessages(true);
@@ -109,7 +102,7 @@ const RSVPSection: React.FC = () => {
 
         try {
             const rsvpsCol = collection(db, PUBLIC_COLLECTION_PATH) as CollectionReference<DocumentData>;
-            const q = query(rsvpsCol, orderBy('createdAt', 'desc'));
+            const q = query(rsvpsCol, orderBy('createdAt', 'desc')); 
 
             const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 const fetchedMessages: RsvpData[] = [];
@@ -125,7 +118,7 @@ const RSVPSection: React.FC = () => {
                     });
                 });
 
-                setMessages(fetchedMessages);
+                setMessages(fetchedMessages); 
                 setIsLoadingMessages(false);
                 if (!submitStatus.toLowerCase().includes('error')) {
                     setSubmitStatus(`Tersambung, ${fetchedMessages.length} ucapan dimuat.`);
@@ -146,11 +139,25 @@ const RSVPSection: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthReady]); 
 
+    // --- FUNGSI UNTUK LOAD MORE/VIEW LESS ---
+    const handleLoadMore = () => {
+        setDisplayLimit((prevLimit: number) => prevLimit + LOAD_MORE_STEP); 
+    };
+
+    const handleViewLess = () => {
+        setDisplayLimit(INITIAL_LIMIT); 
+    };
+
+    // Ambil pesan yang akan ditampilkan
+    const messagesToDisplay = messages.slice(0, displayLimit);
+    const hasMoreMessages = messages.length > displayLimit;
+    const isExpanded = displayLimit > INITIAL_LIMIT;
+
+
     // 3. Handler Pengiriman Formulir (Create)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // VALIDASI KRUSIAL
         if (!userId || !db) {
             console.error("Pengiriman dibatalkan. userId:", userId, "isAuthReady:", isAuthReady); 
             setSubmitStatus("Otentikasi belum selesai. Mohon tunggu 'Connecting...' hilang dan coba lagi.");
@@ -169,7 +176,7 @@ const RSVPSection: React.FC = () => {
 
             const newRsvpData = {
                 name: guestName.trim(),
-                userId: userId, // PENTING: Mengirim UID untuk memuaskan Firestore Rules
+                userId: userId,
                 attendance: attendance as 'yes' | 'no' | 'maybe',
                 guests: 1, 
                 message: message.trim(),
@@ -178,7 +185,6 @@ const RSVPSection: React.FC = () => {
             
             await addDoc(rsvpsCol, newRsvpData);
 
-            // Reset formulir setelah berhasil
             if (!getGuestNameFromUrl()) {
                 setGuestName(''); 
             }
@@ -193,7 +199,7 @@ const RSVPSection: React.FC = () => {
     };
     
     // 4. Handler Penghapusan Pesan (Delete)
-    const handleDeleteMessage = async (messageId: string) => {
+    const handleDeleteMessage = async (messageId: string) => { 
         if (!userId || !db) {
             setSubmitStatus("Pengguna belum terautentikasi.");
             return;
@@ -215,7 +221,7 @@ const RSVPSection: React.FC = () => {
     };
 
     // Utilitas untuk format timestamp
-    const formatTimestamp = (timestamp: Timestamp | null): string => {
+    const formatTimestamp = (timestamp: Timestamp | null): string => { 
         if (!timestamp) return 'Baru saja';
         try {
             const date = timestamp.toDate();
@@ -238,13 +244,6 @@ const RSVPSection: React.FC = () => {
                     }
                     * {
                         font-family: 'Inter', sans-serif;
-                    }
-                    .scroll-container::-webkit-scrollbar {
-                        width: 8px;
-                    }
-                    .scroll-container::-webkit-scrollbar-thumb {
-                        background-color: #607d8b;
-                        border-radius: 10px;
                     }
                 `}
             </style>
@@ -277,9 +276,6 @@ const RSVPSection: React.FC = () => {
                         </div>
                     )}
                     
-                    {/* User ID yang disembunyikan */}
-
-
                     {/* Form Card */}
                     <div 
                         className="max-w-2xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl"
@@ -363,7 +359,6 @@ const RSVPSection: React.FC = () => {
                             {/* Tombol Submit */}
                             <button
                                 type="submit"
-                                // Tombol hanya aktif jika Auth Selesai (isAuthReady) DAN userId sudah terisi
                                 disabled={!isAuthReady || !userId} 
                                 className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                             >
@@ -382,8 +377,9 @@ const RSVPSection: React.FC = () => {
                             {isLoadingMessages && messages.length === 0 ? (
                                 <div className='text-center text-white text-lg font-medium'>Memuat ucapan...</div>
                             ) : (
-                                <ul className="space-y-4 max-h-[500px] overflow-y-auto p-2 scroll-container">
-                                    {messages.map((msg) => (
+                                <ul className="space-y-4 p-2"> 
+                                    {/* Menggunakan messagesToDisplay (hanya 5 atau lebih) */}
+                                    {messagesToDisplay.map((msg: RsvpData) => ( 
                                         <li key={msg.id} className="bg-white p-5 rounded-xl shadow-xl border-t-8 border-[#455a64]/80">
                                             <div className='flex justify-between items-start mb-2'>
                                                 <p className="font-bold text-xl text-[#455a64] font-markazi">
@@ -419,6 +415,33 @@ const RSVPSection: React.FC = () => {
                                     ))}
                                 </ul>
                             )}
+
+                            {/* KONTROL TOMBOL DI BAWAH LIST */}
+                            {(hasMoreMessages || isExpanded) && ( 
+                                <div className='text-center mt-6 flex justify-center space-x-4'>
+                                    
+                                    {/* TOMBOL "LIHAT LEBIH SEDIKIT" */}
+                                    {isExpanded && (
+                                        <button
+                                            onClick={handleViewLess}
+                                            className="bg-gray-200 text-[#455a64] hover:bg-gray-300 font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md"
+                                        >
+                                            Lihat Lebih Sedikit ({INITIAL_LIMIT})
+                                        </button>
+                                    )}
+
+                                    {/* TOMBOL "LOAD MORE" */}
+                                    {hasMoreMessages && (
+                                        <button
+                                            onClick={handleLoadMore}
+                                            className="bg-white text-[#455a64] hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md"
+                                        >
+                                            Lihat {Math.min(LOAD_MORE_STEP, messages.length - displayLimit)} Ucapan Lainnya
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+
                         </div>
                     )}
                 </div>
