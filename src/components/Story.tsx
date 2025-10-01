@@ -9,7 +9,6 @@ interface TimelineItemProps {
     title: string;
     description: string;
     imageUrl: string;
-    // index: number; <-- DIHAPUS DARI INTERFACE
     isLast: boolean; 
 }
 
@@ -25,7 +24,6 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
     title,
     description,
     imageUrl,
-    // index, <-- DIHAPUS DARI DESTRUCTURING
     isLast 
 }) => {
     const cardRef = useRef<HTMLDivElement>(null);
@@ -98,11 +96,14 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 
                     {/* Deskripsi Teks */}
                     <div className="w-full flex flex-col justify-center text-left px-[20px] pb-[20px] pt-0"> 
-                        <p className="text-xs font-medium text-gray-500 mb-1 text-left" style={{fontFamily: "Markazi Text, serif"}}>{date}</p> 
+                        {/* ✅ PERUBAHAN 1: Date text color menjadi #414C3D */}
+                        <p className="text-xs font-medium text-[#414C3D] mb-1 text-left" style={{fontFamily: "Markazi Text, serif"}}>{date}</p> 
                         
-                        <h3 className="text-xl font-serif text-gray-900 mb-3 text-left" style={{fontFamily: "Markazi Text, serif"}}>{title}</h3> 
+                        {/* ✅ PERUBAHAN 2: Title text color menjadi #414C3D */}
+                        <h3 className="text-xl font-serif text-[#414C3D] mb-3 text-left" style={{fontFamily: "Markazi Text, serif"}}>{title}</h3> 
                         
-                        <p className="text-gray-700 leading-relaxed text-left text-sm" style={{fontFamily: "Markazi Text, serif"}}> 
+                        {/* ✅ PERUBAHAN 3: Description text color menjadi #414C3D */}
+                        <p className="text-[#414C3D] leading-relaxed text-left text-sm" style={{fontFamily: "Markazi Text, serif"}}> 
                             {description}
                         </p>
                     </div>
@@ -113,8 +114,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     className={`absolute top-0 hidden md:block`} 
                     style={{ left: PIN_PULL_LEFT_DESKTOP }} 
                 > 
+                    {/* ✅ PERUBAHAN 4: Ikon pin (lingkaran) diubah menjadi border-2 border-white */}
                     <div className="bg-white border-2 border-white rounded-full w-8 h-8 flex items-center justify-center relative z-10 shadow-md">
-                        <svg className="w-4 h-4 text-[#37474f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        {/* ✅ PERUBAHAN 5: Warna ikon kalender menjadi #727E6A */}
+                        <svg className="w-4 h-4 text-[#727E6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
@@ -122,6 +125,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     {/* GARIS VERTIKAL DESKTOP - Tinggi dinamis */}
                     {shouldDrawLine && (
                         <div 
+                            // ✅ PERUBAHAN 6: Garis vertikal diubah menjadi putih (bg-white)
                             className="absolute w-0.5 bg-white z-0" 
                             style={{ 
                                 top: desktopLineTop, 
@@ -137,8 +141,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     className={`absolute top-0 md:hidden z-10`} 
                     style={{left: PIN_PULL_LEFT_MOBILE}}
                 >
+                    {/* ✅ PERUBAHAN 7: Ikon pin (lingkaran) diubah menjadi border-2 border-white */}
                     <div className="bg-white border-2 border-white rounded-full w-6 h-6 flex items-center justify-center relative shadow-sm">
-                        <svg className="w-4 h-4 text-[#37474f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        {/* ✅ PERUBAHAN 8: Warna ikon kalender menjadi #727E6A */}
+                        <svg className="w-4 h-4 text-[#727E6A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
@@ -146,6 +152,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                     {/* GARIS VERTIKAL MOBILE - Tinggi dinamis */}
                     {shouldDrawLine && (
                         <div 
+                            // ✅ PERUBAHAN 9: Garis vertikal diubah menjadi putih (bg-white)
                             className="absolute w-0.5 bg-white z-0" 
                             style={{ 
                                 top: mobileLineTop, 
@@ -188,7 +195,7 @@ const Story: React.FC = () => {
     ];
 
     return (
-        <section className="py-20 bg-[#546e7a]">
+        <section className="py-20 bg-[#727E6A]">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <div className="mb-4">
@@ -199,7 +206,8 @@ const Story: React.FC = () => {
                         />
                     </div>
                     
-                    <p className="text-xl text-gray-300 max-w-2xl mx-auto" style={{fontFamily: "Markazi Text, serif"}}>
+                    {/* ✅ PERUBAHAN 10: Teks 'The beautiful journey...' diubah menjadi putih (text-white) agar terlihat jelas di latar belakang #727E6A */}
+                    <p className="text-xl text-white max-w-2xl mx-auto" style={{fontFamily: "Markazi Text, serif"}}>
                         The beautiful journey of our love
                     </p>
                     
@@ -210,7 +218,6 @@ const Story: React.FC = () => {
                     {loveStoryEvents.map((event, index) => (
                         <TimelineItem
                             key={index}
-                            // index={index} <-- DIHAPUS DARI PEMANGGILAN
                             isLast={index === loveStoryEvents.length - 1} // Kirim prop isLast
                             date={event.date}
                             title={event.title}

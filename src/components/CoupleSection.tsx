@@ -89,13 +89,13 @@ const CoupleSection: React.FC = () => {
             <div 
                 className="absolute inset-0"
                 style={{
-                    backgroundImage: "url('/assets/images/bg1.jpg')",
+                    backgroundImage: "url('/assets/images/bg1.png')",
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                 }}
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#607d8b]/70 to-[#263238]/95" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#727E6A]/70 to-[#414C3D]/95" />
             
             {/* Konten Teks & Tanggal (Atas) */}
             <div className="relative z-10 pt-32 pb-20 sm:pt-24 sm:pb-24 md:pt-32 md:pb-32"> 
@@ -108,7 +108,7 @@ const CoupleSection: React.FC = () => {
                     </div>
 
                     <h1 className="text-4xl sm:text-5xl md:text-6xl font-normal font-whisper tracking-tight mb-6 sm:mb-8">
-                        Alya &amp; Rian
+                        Yudhistira &amp; Pacar
                     </h1>
 
                     {/* Tanggal */}

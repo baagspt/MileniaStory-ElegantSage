@@ -35,7 +35,7 @@ const CoverScreen: React.FC<CoverScreenProps> = ({
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/assets/images/bg.png')",
+          backgroundImage: "url('/assets/images/bg.jpg')",
           filter: 'blur(1px)',
         }}
       ></div>
@@ -53,7 +53,7 @@ const CoverScreen: React.FC<CoverScreenProps> = ({
         </div>
 
         <h1 className="text-4xl md:text-6xl font-normal font-whisper tracking-tight mb-12">
-          Alya &amp; Rian
+          Yudhistira &amp; Pacar
         </h1>
 
         <p className="text-sm font-light font-Alan-Sans mb-40">02.02.2026</p>

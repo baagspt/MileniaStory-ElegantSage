@@ -19,7 +19,7 @@ interface RsvpData {
 
 // Konstanta untuk batas tampilan awal dan langkah pemuatan
 const INITIAL_LIMIT = 5; // <--- DIUBAH MENJADI 5
-const LOAD_MORE_STEP = 5;  // <--- DIUBAH MENJADI 5
+const LOAD_MORE_STEP = 5;  // <--- DIUBAH MENJADI 5
 
 // Komponen Utama Aplikasi
 const RSVPSection: FC = () => {
@@ -30,6 +30,7 @@ const RSVPSection: FC = () => {
     const [message, setMessage] = useState<string>('');
     const [userId, setUserId] = useState<string | null>(null); 
     const [isAuthReady, setIsAuthReady] = useState<boolean>(false);
+    // ✅ PERUBAHAN: Status pesan diseragamkan ke bahasa Indonesia
     const [submitStatus, setSubmitStatus] = useState<string>('Menghubungkan ke database...');
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(true);
     const [displayLimit, setDisplayLimit] = useState(INITIAL_LIMIT); // State untuk mengontrol batas tampilan
@@ -120,7 +121,8 @@ const RSVPSection: FC = () => {
 
                 setMessages(fetchedMessages); 
                 setIsLoadingMessages(false);
-                if (!submitStatus.toLowerCase().includes('error')) {
+                if (!submitStatus.toLowerCase().includes('error') && !submitStatus.toLowerCase().includes('berhasil')) {
+                    // ✅ PERUBAHAN: Status teks ucapan
                     setSubmitStatus(`Tersambung, ${fetchedMessages.length} ucapan dimuat.`);
                 }
             }, (error) => {
@@ -190,6 +192,7 @@ const RSVPSection: FC = () => {
             }
             setAttendance('');
             setMessage('');
+            // ✅ PERUBAHAN: Status sukses
             setSubmitStatus("Berhasil Dikirim! Terima kasih. Ucapan Anda akan segera muncul.");
 
         } catch (error) {
@@ -250,7 +253,8 @@ const RSVPSection: FC = () => {
             
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             
-            <section className="py-12 md:py-20 bg-[#90a4ae] min-h-screen flex items-center justify-center"> 
+            {/* ✅ PERUBAHAN 1: Background section diubah menjadi #727E6A */}
+            <section className="py-12 md:py-20 bg-[#727E6A] min-h-screen flex items-center justify-center"> 
                 <div className="container mx-auto px-4 w-full max-w-4xl">
                     
                     {/* Header */}
@@ -269,7 +273,7 @@ const RSVPSection: FC = () => {
                         </p>
                     </div>
 
-                    {/* Status Message */}
+                    {/* Status Message (TETAP PUTIH) */}
                     {submitStatus && (
                         <div className={`max-w-2xl mx-auto mb-4 p-4 rounded-lg text-center font-medium text-base ${submitStatus.toLowerCase().includes('error') ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}>
                             {submitStatus}
@@ -280,11 +284,13 @@ const RSVPSection: FC = () => {
                     <div 
                         className="max-w-2xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl"
                     >
-                        <h1 className="font-bold text-gray-700 mb-6 text-center font-markazi text-3xl md:text-4xl">Konfirmasi & Ucapan</h1>
+                        {/* ✅ PERUBAHAN 3: Header form diubah menjadi text-[#414C3D] */}
+                        <h1 className="font-bold text-[#414C3D] mb-6 text-center font-markazi text-3xl md:text-4xl">Konfirmasi & Ucapan</h1>
                         <form onSubmit={handleSubmit}>
                             {/* Nama */}
                             <div className="mb-6">
-                                <label htmlFor="name" className="block text-gray-700 mb-2 font-semibold text-sm md:text-base font-markazi">
+                                {/* ✅ PERUBAHAN 4: Label form diubah menjadi text-[#414C3D] */}
+                                <label htmlFor="name" className="block text-[#414C3D] mb-2 font-semibold text-sm md:text-base font-markazi">
                                     Nama Anda
                                 </label>
                                 <input
@@ -294,7 +300,8 @@ const RSVPSection: FC = () => {
                                     onChange={(e) => setGuestName(e.target.value)}
                                     // Membuat input read-only jika nama berasal dari URL
                                     readOnly={getGuestNameFromUrl() !== ''} 
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-sm md:text-base text-black transition disabled:bg-gray-100"
+                                    // ✅ PERUBAHAN 5: Focus Ring Input dan Textarea
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#414C3D] text-sm md:text-base text-black transition disabled:bg-gray-100"
                                     placeholder="Tamu Undangan"
                                     required
                                 />
@@ -305,7 +312,8 @@ const RSVPSection: FC = () => {
                             
                             {/* Attendance */}
                             <div className="mb-6">
-                                <p className="text-gray-700 mb-3 font-semibold text-sm md:text-base font-markazi">Apakah anda akan hadir?</p>
+                                {/* ✅ PERUBAHAN 4: Label form diubah menjadi text-[#414C3D] */}
+                                <p className="text-[#414C3D] mb-3 font-semibold text-sm md:text-base font-markazi">Apakah anda akan hadir?</p>
                                 <div className="flex space-x-6">
                                     {/* Ya */}
                                     <div className="flex items-center">
@@ -315,7 +323,8 @@ const RSVPSection: FC = () => {
                                             name="attendance"
                                             checked={attendance === 'yes'}
                                             onChange={() => setAttendance('yes')}
-                                            className="mr-2 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64]"
+                                            // ✅ PERUBAHAN 5: Warna Radio Button
+                                            className="mr-2 h-5 w-5 text-[#414C3D] border-gray-300 focus:ring-[#414C3D]"
                                             required
                                         />
                                         <label htmlFor="attending-yes" className="text-gray-700 text-sm md:text-base font-markazi">
@@ -330,7 +339,8 @@ const RSVPSection: FC = () => {
                                             name="attendance"
                                             checked={attendance === 'no'}
                                             onChange={() => setAttendance('no')}
-                                            className="mr-2 h-5 w-5 text-[#455a64] border-gray-300 focus:ring-[#455a64]"
+                                            // ✅ PERUBAHAN 5: Warna Radio Button
+                                            className="mr-2 h-5 w-5 text-[#414C3D] border-gray-300 focus:ring-[#414C3D]"
                                             required
                                         />
                                         <label htmlFor="attending-no" className="text-gray-700 text-sm md:text-base font-markazi">
@@ -342,7 +352,8 @@ const RSVPSection: FC = () => {
 
                             {/* Pesan */}
                             <div className="mb-8">
-                                <label htmlFor="message" className="block text-gray-700 mb-2 font-semibold text-sm md:text-base font-markazi"> 
+                                {/* ✅ PERUBAHAN 4: Label form diubah menjadi text-[#414C3D] */}
+                                <label htmlFor="message" className="block text-[#414C3D] mb-2 font-semibold text-sm md:text-base font-markazi"> 
                                     Pesan (Ucapan & Doa)
                                 </label>
                                 <textarea
@@ -350,7 +361,8 @@ const RSVPSection: FC = () => {
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     rows={4}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#455a64] text-sm md:text-base text-black transition"
+                                    // ✅ PERUBAHAN 5: Focus Ring Input dan Textarea
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#414C3D] text-sm md:text-base text-black transition"
                                     placeholder="Bagikan Ucapan Kepada Mempelai" 
                                     required
                                 ></textarea>
@@ -360,7 +372,8 @@ const RSVPSection: FC = () => {
                             <button
                                 type="submit"
                                 disabled={!isAuthReady || !userId} 
-                                className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg text-sm md:text-base"
+                                // ✅ PERUBAHAN 6: Latar belakang dan hover tombol (sudah benar)
+                                className="w-full bg-[#414C3D] hover:bg-[#5C6758] text-white font-medium py-2 px-4 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg text-sm md:text-base"
                             >
                                 {isAuthReady && userId ? "Kirim Ucapan dan Doa" : "Connecting..."}
                             </button>
@@ -371,7 +384,7 @@ const RSVPSection: FC = () => {
                     {(messages.length > 0 || isLoadingMessages) && (
                         <div className="max-w-2xl mx-auto mt-12">
                             <h3 
-                                // PERUBAHAN: Mengurangi ukuran font dari text-3xl menjadi text-2xl.
+                                // PERUBAHAN: Warna text-white dipertahankan karena di atas background gelap
                                 className="text-2xl font-bold text-white mb-6 text-center font-markazi"
                             >
                                 Ucapan & Doa Restu ({messages.length})
@@ -383,9 +396,13 @@ const RSVPSection: FC = () => {
                                 <ul className="space-y-4 p-2"> 
                                     {/* Menggunakan messagesToDisplay (hanya 5 atau lebih) */}
                                     {messagesToDisplay.map((msg: RsvpData) => ( 
-                                        <li key={msg.id} className="bg-white p-5 rounded-xl shadow-xl border-t-8 border-[#455a64]/80">
+                                        <li key={msg.id} 
+                                            // ✅ PERUBAHAN 7: Border Top pada Ucapan (sudah benar)
+                                            className="bg-white p-5 rounded-xl shadow-xl border-t-8 border-[#414C3D]/80">
                                             <div className='flex justify-between items-start mb-2'>
-                                                <p className="font-bold text-xl text-[#455a64] font-markazi">
+                                                <p 
+                                                    // ✅ PERUBAHAN 8: Warna teks nama (sudah benar)
+                                                    className="font-bold text-xl text-[#414C3D] font-markazi">
                                                     {msg.name} 
                                                 </p>
                                                 <span className={`ml-4 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider ${msg.attendance === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -427,7 +444,8 @@ const RSVPSection: FC = () => {
                                     {isExpanded && (
                                         <button
                                             onClick={handleViewLess}
-                                            className="bg-gray-200 text-[#455a64] hover:bg-gray-300 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
+                                            // ✅ PERUBAHAN 9: Warna tombol View Less (sudah benar)
+                                            className="bg-gray-200 text-[#414C3D] hover:bg-gray-300 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
                                         >
                                             Lihat Lebih Sedikit ({INITIAL_LIMIT})
                                         </button>
@@ -437,7 +455,8 @@ const RSVPSection: FC = () => {
                                     {hasMoreMessages && (
                                         <button
                                             onClick={handleLoadMore}
-                                            className="bg-white text-[#455a64] hover:bg-gray-100 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
+                                            // ✅ PERUBAHAN 9: Warna tombol Load More (sudah benar)
+                                            className="bg-white text-[#414C3D] hover:bg-gray-100 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
                                         >
                                             Lihat {Math.min(LOAD_MORE_STEP, messages.length - displayLimit)} Ucapan Lainnya
                                         </button>

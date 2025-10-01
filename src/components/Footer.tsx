@@ -11,7 +11,7 @@ export default function Example() {
             `}</style>
             
             {/* Ganti text-gray-800/70 menjadi text-white/80 */}
-            <footer className="flex flex-col items-center justify-around w-full pt-3 pb-6 text-sm bg-[#37474f] text-white/80">
+            <footer className="flex flex-col items-center justify-around w-full pt-3 pb-6 text-sm bg-[#414C3D] text-white/80">
                 <img 
                     src="/assets/images/logo3.png" 
                     alt="Wedding Logo" 
