@@ -1,27 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth'; 
-import { initializeApp } from 'firebase/app';
+import { signInAnonymously, onAuthStateChanged } from 'firebase/auth'; 
+import { auth, db } from '../firebase/config';
 // Impor Firestore baru yang diperlukan untuk real-time dan penulisan data
-import { getFirestore, collection, query, onSnapshot, addDoc, Timestamp, orderBy, CollectionReference, DocumentData } from 'firebase/firestore'; 
-
-// --- Deklarasi Global Variables (MANDATORY) ---
-declare const __app_id: string;
-declare const __firebase_config: string;
-declare const __initial_auth_token: string;
-
-// --- Konfigurasi dan Inisialisasi Firebase ---
-let auth: any = null;
-let db: any = null;
-
-// Menginisialisasi Firebase di luar komponen
-try {
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-    const app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    auth = getAuth(app);
-} catch (error) {
-    console.error("Gagal menginisialisasi Firebase:", error);
-}
+import { collection, query, onSnapshot, addDoc, Timestamp, orderBy, CollectionReference, DocumentData } from 'firebase/firestore'; 
 
 // --- Tipe Data untuk RSVP ---
 interface RsvpData {
@@ -44,9 +25,8 @@ const RSVPSection: React.FC = () => {
     const [submitStatus, setSubmitStatus] = useState<string>('Menghubungkan ke database...');
     const [isLoadingMessages, setIsLoadingMessages] = useState<boolean>(true);
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     // Path publik untuk data yang dibagikan antar pengguna (misal: ucapan)
-    const PUBLIC_COLLECTION_PATH = `/artifacts/${appId}/public/data/rsvps`;
+    const PUBLIC_COLLECTION_PATH = `rsvps`;
 
     // 1. Otentikasi dan Mendapatkan UserId
     useEffect(() => {
@@ -64,14 +44,9 @@ const RSVPSection: React.FC = () => {
                 setSubmitStatus("Tersambung dan siap.");
                 setIsAuthReady(true);
             } else {
-                // Coba sign in dengan token yang disediakan atau anonim jika belum ada
+                // Coba sign in secara anonim
                 try {
-                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    if (token) {
-                        await signInWithCustomToken(auth, token);
-                    } else {
-                        await signInAnonymously(auth); 
-                    }
+                    await signInAnonymously(auth); 
                 } catch (error) {
                     console.error("Firebase authentication error:", error);
                     setSubmitStatus("Error: Gagal otentikasi. Cek konfigurasi Firebase.");
