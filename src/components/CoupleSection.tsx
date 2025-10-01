@@ -13,7 +13,9 @@ interface TimeLeft {
 
 const calculateTimeLeft = (): TimeLeft => {
     // Tanggal target: 2026-02-02
-    const difference = +new Date('2026-2-02') - +new Date(); 
+    // PERBAIKAN: Mengubah format tanggal dari 'YYYY-M-DD' menjadi 'YYYY/MM/DD' untuk kompatibilitas mobile yang lebih baik.
+    const targetDate = '2026/02/02'; 
+    const difference = +new Date(targetDate) - +new Date(); 
     
     if (difference <= 0) {
         return { days: 0, hours: 0, minutes: 0, seconds: 0 };
