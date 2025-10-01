@@ -360,7 +360,7 @@ const RSVPSection: FC = () => {
                             <button
                                 type="submit"
                                 disabled={!isAuthReady || !userId} 
-                                className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                                className="w-full bg-[#455a64] hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg text-sm md:text-base"
                             >
                                 {isAuthReady && userId ? "Kirim Ucapan dan Doa" : "Connecting..."}
                             </button>
@@ -370,7 +370,10 @@ const RSVPSection: FC = () => {
                     {/* Daftar Ucapan */}
                     {(messages.length > 0 || isLoadingMessages) && (
                         <div className="max-w-2xl mx-auto mt-12">
-                            <h3 className="text-3xl font-bold text-white mb-6 text-center font-markazi">
+                            <h3 
+                                // PERUBAHAN: Mengurangi ukuran font dari text-3xl menjadi text-2xl.
+                                className="text-2xl font-bold text-white mb-6 text-center font-markazi"
+                            >
                                 Ucapan & Doa Restu ({messages.length})
                             </h3>
                             
@@ -400,9 +403,9 @@ const RSVPSection: FC = () => {
                                                 {msg.userId === userId && (
                                                     <button 
                                                         onClick={() => handleDeleteMessage(msg.id)}
-                                                        className='text-xs text-red-600 hover:text-red-800 font-semibold transition'
+                                                        className='text-[10px] text-red-600 hover:text-red-800 font-medium py-0.5 px-1 rounded-sm transition border border-transparent hover:border-red-600'
                                                     >
-                                                        Hapus Pesan Saya
+                                                        ❌ Hapus
                                                     </button>
                                                 )}
 
@@ -424,7 +427,7 @@ const RSVPSection: FC = () => {
                                     {isExpanded && (
                                         <button
                                             onClick={handleViewLess}
-                                            className="bg-gray-200 text-[#455a64] hover:bg-gray-300 font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md"
+                                            className="bg-gray-200 text-[#455a64] hover:bg-gray-300 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
                                         >
                                             Lihat Lebih Sedikit ({INITIAL_LIMIT})
                                         </button>
@@ -434,7 +437,7 @@ const RSVPSection: FC = () => {
                                     {hasMoreMessages && (
                                         <button
                                             onClick={handleLoadMore}
-                                            className="bg-white text-[#455a64] hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition duration-300 shadow-md"
+                                            className="bg-white text-[#455a64] hover:bg-gray-100 font-medium py-1.5 px-3 rounded-lg transition duration-300 shadow-md text-sm"
                                         >
                                             Lihat {Math.min(LOAD_MORE_STEP, messages.length - displayLimit)} Ucapan Lainnya
                                         </button>
