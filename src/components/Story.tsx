@@ -77,7 +77,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
                 <div 
                     ref={cardRef} // Pasang ref di sini untuk mengukur tinggi
                     className="flex flex-col w-full max-w-[325px] 
-                    md:max-w-[520px] 
+                    md:max-w-[500px] 
                     rounded-xl shadow-2xl bg-white border border-gray mx-auto md:mx-0 md:ml-6" // mx-auto untuk pusatkan di mobile
                 > 
                     
