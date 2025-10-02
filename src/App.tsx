@@ -112,7 +112,7 @@ function App() {
           <>
             {/* Bagian 70% (CoverScreen) - Terkunci & Trigger Scroll */}
             <div 
-              className="w-[70%] h-full" 
+              className="w-[68%] h-full" 
               onWheel={handleWheelOnCover} // Event Listener untuk memicu scroll 30%
             > 
               <CoverScreen
@@ -125,7 +125,7 @@ function App() {
 
             {/* Bagian 30% (Konten Utama) - Target Scroll. Tambahkan Ref. */}
             <div 
-              className="w-[30%] h-full overflow-y-auto bg-white shadow-lg"
+              className="w-[32%] h-full overflow-y-auto bg-white shadow-lg"
               ref={contentRef} // Target Ref untuk scroll
             >
               {MainContentSections}
